@@ -1,0 +1,45 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '5.0.0'
+    id 'java'
+}
+
+group 'com.suredroid.discord'
+version '1.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { //noinspection GroovyAssignabilityCheck
+        url 'https://jitpack.io' }
+}
+
+dependencies {
+
+    //Class Scanning
+    compile group: 'io.github.classgraph', name: 'classgraph', version: '4.8.37'
+
+    //Audio Version Of Javacord
+    compile group: 'com.github.Bastian', name: 'Lavaplayer-Wrapper', version: 'master-SNAPSHOT'
+    compile group: 'com.github.Bastian.Javacord', name: 'javacord', version: 'ae51320'
+
+    //Direct Access to LavaPlayer
+    implementation 'com.sedmelluq:lavaplayer:1.3.11'
+
+    //Apache Suite
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
+    // runtimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version:'2.11.1'
+
+    compile group: 'org.apache.commons', name: 'commons-text', version: '1.6'
+    implementation 'com.google.code.gson:gson:2.2.4'
+
+    //Annotations
+
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.6'
+
+    compile group: 'org.jetbrains', name: 'annotations', version: '13.0'
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
