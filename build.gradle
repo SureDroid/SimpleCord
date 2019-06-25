@@ -5,6 +5,7 @@ plugins {
 
 group 'com.suredroid.discord'
 version '1.0'
+apply plugin: 'maven'
 
 sourceCompatibility = 1.8
 

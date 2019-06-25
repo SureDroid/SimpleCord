@@ -9,7 +9,7 @@ public enum Error {
     InvalidArguments("Invalid Arguments","You have provided invalid arguments for this command.\nPlease use !help [command] to get the proper usage for this command."),
     IncorrectArgumentNumber("Incorrect Argument Number","You do not have the correct number of arguments to run this command.\nPlease use !help [command] to get the proper usage for this command."),
     RoleNotFound("Role Not Found","One of your arguments, a role, was not found on this server.\nPlease make sure you are using correct formatting (either an ID, Role name with an *@* before it, or mentioning it.)"),
-
+    UserNotFound("User Not Found", "One of your arguments, a user, was not found. Please make sure you are either mentioning the user, providing the user's discriminated name, or providing the user's id."),
     //Audio
     NotPlayingTrack("Not Playing Anything","The bot isn't playing anything right now."),
     UserNotConnected("You Aren't Connected","You are not connected to a voice channel. To play a song, you must be in a voice channel."),

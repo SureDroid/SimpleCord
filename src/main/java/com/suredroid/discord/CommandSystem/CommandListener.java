@@ -65,7 +65,7 @@ public class CommandListener implements MessageCreateListener {
 
                 Object customObject = generateObject(routeClassInfo);
 
-                if(customObject != null){
+                if (customObject != null) {
                     if (CommandBase.list.keySet().contains(name)) {
                         CommandBase cb = CommandBase.list.get(name);
                         if (cb.description.isEmpty() && !desc.isEmpty())
@@ -88,19 +88,19 @@ public class CommandListener implements MessageCreateListener {
                         AnnotationParameterValueList annotationParamVals = methodInfo.getAnnotationInfo("com.suredroid.discord.Annotations.Command").getParameterValues();
                         boolean visible = (boolean) annotationParamVals.getValue("visible");
                         String name = (String) annotationParamVals.getValue("name"), desc = (String) annotationParamVals.getValue("desc"), usage = (String) annotationParamVals.getValue("usage"), example = (String) annotationParamVals.getValue("example");
-                        if(name.isEmpty())
+                        if (name.isEmpty())
                             name = methodInfo.getName();
                         name = name.toLowerCase();
 
                         CommandBase cb;
-                        if(CommandBase.list.keySet().contains(name)){
+                        if (CommandBase.list.keySet().contains(name)) {
                             cb = CommandBase.list.get(name);
                         } else {
-                            cb = new CommandBase(name,desc,usage,example,visible);
+                            cb = new CommandBase(name, desc, usage, example, visible);
                         }
                         Object customObject = generateObject(routeClassInfo);
-                        if(customObject!= null)
-                            cb.addRun(methodInfo.loadClassAndGetMethod(),customObject);
+                        if (customObject != null)
+                            cb.addRun(methodInfo.loadClassAndGetMethod(), customObject);
                     }
                 }
             }
@@ -108,21 +108,26 @@ public class CommandListener implements MessageCreateListener {
 
             for (CommandBase cb : CommandBase.list.values()) {
                 String message = "Your %1$s in the " + cb.command + " command is empty. Please provide a %1$s value for the command annotation. Populating with default values for now...";
-                if(cb.description.isEmpty()){
-                    System.out.println(String.format(message,"description"));
+                if (cb.description.isEmpty()) {
+                    System.out.println(String.format(message, "description"));
                     cb.description = "N/A";
                 }
-                if(cb.usage.isEmpty()){
-                    System.out.println(String.format(message,"usage"));
+                if (cb.usage.isEmpty()) {
+                    System.out.println(String.format(message, "usage"));
                     cb.usage = "N/A";
                 }
             }
+
+            routeClassInfoList = scanResult.getClassesWithAnnotation("com.suredroid.discord.Annotations.Listener");
+            for (ClassInfo routeClassInfo : routeClassInfoList) {
+                addListener(routeClassInfo);
+            }
+
 
             routeClassInfoList = scanResult.getClassesWithAnnotation("com.suredroid.discord.Annotations.Create");
             for (ClassInfo routeClassInfo : routeClassInfoList) {
                 generateObject(routeClassInfo);
             }
-
 
 
         } catch (Exception e) {
@@ -131,14 +136,14 @@ public class CommandListener implements MessageCreateListener {
         }
     }
 
-    private ClassGraph requiredInfoGraph(){
+    private ClassGraph requiredInfoGraph() {
         return new ClassGraph().enableAllInfo();
     }
 
-    private InfoWrapper getClassInfo(@NonNull Class<?> clazz){
+    private InfoWrapper getClassInfo(@NonNull Class<?> clazz) {
         try {
             ScanResult result = requiredInfoGraph().whitelistClasses(clazz.getName()).scan();
-            return new InfoWrapper(result.getAllClasses().get(0),result);
+            return new InfoWrapper(result.getAllClasses().get(0), result);
         } catch (Exception e) {
             System.out.println("Error scanning classes: " + e.getMessage());
             e.printStackTrace();
@@ -148,7 +153,7 @@ public class CommandListener implements MessageCreateListener {
 
     public <T extends GloballyAttachableListener> T addListener(@NotNull T object) {
         //noinspection unchecked
-        addListener((Class<T>) object.getClass(),object);
+        addListener((Class<T>) object.getClass(), object);
         return object;
     }
 
@@ -156,40 +161,45 @@ public class CommandListener implements MessageCreateListener {
         return addListener(clazz, null);
     }
 
-    private <T extends GloballyAttachableListener> T addListener(Class<T> clazz, T object)
-    {
+    private <T extends GloballyAttachableListener> T addListener(Class<T> clazz, T object) {
         T obj;
         if (object == null)
             obj = generateObject(clazz);
         else
             obj = object;
         if (obj != null) {
-            Arrays.stream(clazz.getInterfaces()).filter(info -> Arrays.asList(info.getInterfaces()).contains(GloballyAttachableListener.class)).forEach(info -> {
-                if (info == MessageCreateListener.class) {
-                    messageCreateListeners.add((MessageCreateListener) obj);
-                } else {
-                    DUtils.getApi().addListener(clazz, obj);
+            Class<?>[] interfaces = Arrays.stream(clazz.getInterfaces()).filter(info -> Arrays.asList(info.getInterfaces()).contains(GloballyAttachableListener.class)).toArray(Class[]::new);
+            if (interfaces.length > 0) {
+                for (Class info : interfaces) {
+                    if (info == MessageCreateListener.class) {
+                        messageCreateListeners.add((MessageCreateListener) obj);
+                    } else {
+                        DUtils.getApi().addListener(clazz, obj);
+                    }
                 }
-            });
+            } else {
+                System.out.println("A globally attachable listener has not been implemented to " + clazz.getName() + "\nSkipping adding listener class...");
+            }
         }
         return obj;
     }
 
-    private void addListener(ClassInfo classInfo, Object object) {
-        Object obj;
-        if (object == null)
-            obj = generateObject(classInfo);
-        else
-            obj = object;
+    private void addListener(ClassInfo classInfo) {
+        Object obj = generateObject(classInfo);
         if (obj != null) {
-            classInfo.getInterfaces().stream().filter(info -> info.implementsInterface("org.javacord.api.DiscordApi.GloballyAttachableListener")).forEach(info -> {
-                if (info.getName().equals(MessageCreateListener.class.getName())) {
-                    messageCreateListeners.add((MessageCreateListener) obj);
-                } else {
-                    Class<GloballyAttachableListener> clazz = (Class<GloballyAttachableListener>) info.loadClass();
-                    DUtils.getApi().addListener(clazz, clazz.cast(obj));
+            ClassInfo[] interfaces = classInfo.getInterfaces().stream().filter(info -> info.implementsInterface("org.javacord.api.listener.GloballyAttachableListener")).toArray(ClassInfo[]::new);
+            if (interfaces.length > 0) {
+                for(ClassInfo info : interfaces) {
+                    if (info.getName().equals(MessageCreateListener.class.getName())) {
+                        messageCreateListeners.add((MessageCreateListener) obj);
+                    } else {
+                        Class<GloballyAttachableListener> clazz = (Class<GloballyAttachableListener>) info.loadClass();
+                        DUtils.getApi().addListener(clazz, clazz.cast(obj));
+                    }
                 }
-            });
+            } else {
+                System.out.println("A globally attachable listener has not been implemented to " + classInfo.getName() + "\nSkipping adding listener class...");
+            }
         }
     }
 
@@ -197,23 +207,16 @@ public class CommandListener implements MessageCreateListener {
     public <T> T generateObject(Class clazz) {
         InfoWrapper wrapper = getClassInfo(clazz);
         T obj = null;
-        if(wrapper != null) {
+        if (wrapper != null) {
             obj = (T) generateObject(wrapper.getRouteClassInfo());
             wrapper.result.close();
         }
         return obj;
     }
 
-    @Data
-    private class InfoWrapper {
-        private final ClassInfo routeClassInfo;
-        private final ScanResult result;
-
-    }
-
-    private Object generateObject(ClassInfo routeClassInfo){
-        Optional<Object> optobj = getObjectList().stream().filter(o->o.getClass().equals(routeClassInfo.loadClass())).findAny();
-        if(optobj.isPresent())
+    private Object generateObject(ClassInfo routeClassInfo) {
+        Optional<Object> optobj = getObjectList().stream().filter(o -> o.getClass().equals(routeClassInfo.loadClass())).findAny();
+        if (optobj.isPresent())
             return optobj.get();
         Object customObject = null;
         try {
@@ -249,17 +252,15 @@ public class CommandListener implements MessageCreateListener {
         } catch (InvocationTargetException e) {
             System.out.println("Cannot create a new class due to internal exception. Cause: " + e.getCause().getMessage() + "\nSkipping class " + routeClassInfo.getName() + "...");
             e.getCause().printStackTrace();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Error loading class: " + e.getMessage());
             e.printStackTrace();
         }
-        if(customObject!=null)
+        if (customObject != null)
             getObjectList().add(customObject);
 
         return customObject;
     }
-
 
     @SuppressWarnings("Duplicates")
     @Override
@@ -325,6 +326,13 @@ public class CommandListener implements MessageCreateListener {
     private String getRest(String text) {
         int index = text.indexOf(' ');
         return index > -1 ? text.substring(index + 1) : "";
+    }
+
+    @Data
+    private class InfoWrapper {
+        private final ClassInfo routeClassInfo;
+        private final ScanResult result;
+
     }
 
 }

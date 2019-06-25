@@ -56,7 +56,7 @@ public class CommonUtils {
                 //noinspection unchecked
                 return Optional.of((T) gson.fromJson(fr, object.getClass()));
             } catch (FileNotFoundException e) {
-                System.out.println("File not found.");
+                System.out.println("File not found: " + filename);
             }
         }
         return Optional.empty();
@@ -68,7 +68,19 @@ public class CommonUtils {
             FileReader fr = new FileReader(file);
             return Optional.of(gson.fromJson(fr, type));
         } catch (FileNotFoundException e) {
-            System.out.println("File not found.");
+            System.out.println("File not found: " + filename);
+        }
+        return Optional.empty();
+    }
+
+    public static <T> Optional<T> getInternalJson(String filePath,  T object){
+        try {
+            InputStream stream = DiscordBot.class.getResourceAsStream(filePath);
+            InputStreamReader reader = new InputStreamReader(stream);
+            //noinspection unchecked
+            return Optional.of((T) gson.fromJson(reader, object.getClass()));
+        } catch (NullPointerException e) {
+            System.out.println("File not found / Can't be read: " + filePath);
         }
         return Optional.empty();
     }
@@ -94,6 +106,8 @@ public class CommonUtils {
             DiscordBot.logger.error(e1.getMessage(),e1);
         }
     }
+
+
 
     public static Optional<String> readInternalFile(String path) {
         StringWriter writer = new StringWriter();

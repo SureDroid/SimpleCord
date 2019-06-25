@@ -1,5 +1,6 @@
 package com.suredroid.discord.CommandSystem;
 
+import com.suredroid.discord.DiscordBot;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 import java.lang.reflect.Method;
@@ -14,7 +15,7 @@ public class CommandBase extends Base {
     HashMap<Integer, MethodWrapper> runs = new HashMap<>();
 
     CommandBase(String name, String description, String usage, String example, boolean visible) {
-        super(name, description, usage, example);
+        super(name, description, DiscordBot.getPrefix() + name + " " + usage, example);
         this.visible = visible;
         list.put(name, this);
         if(!name.equals(name.toLowerCase()))
