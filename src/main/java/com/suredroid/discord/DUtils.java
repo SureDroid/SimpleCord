@@ -173,7 +173,7 @@ public class DUtils {
     }
 
 
-    // Message Stuff
+    // EmbedMessage Stuff
 
     public static void setFooter(String footer) {
         footerString = footer;
@@ -185,6 +185,10 @@ public class DUtils {
 
     public static void setBaseChange(Consumer<EmbedBuilder> baseChange) {
         modifyBase = baseChange;
+    }
+
+    public static EmbedBuilder createEmbed() {
+        return baseEmbed.get();
     }
 
     public static EmbedBuilder createEmbed(String title, String message) {

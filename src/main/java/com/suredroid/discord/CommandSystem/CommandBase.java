@@ -1,33 +1,29 @@
 package com.suredroid.discord.CommandSystem;
 
-import com.suredroid.discord.DiscordBot;
+import com.suredroid.discord.EmbedMessage;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 
-public class CommandBase extends Base {
+public class CommandBase {
     static ArrayList<Object> objectList = new ArrayList<>();
-    static HashMap<String, CommandBase> list = new HashMap<>();
-    HashMap<Integer, MethodWrapper> runs = new HashMap<>();
+    static HashMap<String, CommandBase> list = new HashMap<>(), fullBase = new HashMap<>();
+    HashMap<Integer, MethodInfo> runs = new HashMap<>();
+    public CommandProperties properties;
 
-    CommandBase(String name, String description, String usage, String example, boolean visible) {
-        super(name, description, DiscordBot.getPrefix() + name + " " + usage, example);
-        this.visible = visible;
+    CommandBase(CommandProperties properties) {
+        this.properties = properties;
+        String name = properties.getName();
         list.put(name, this);
-        if(!name.equals(name.toLowerCase()))
-            System.out.println("All name is not in lowercase. This may cause future problems with command detection. -> " + name);
-
+        fullBase.put(name, this);
+        for(String alias : properties.getAliases())
+            fullBase.put(alias, this);
     }
 
-    void gatherRuns(Object object) {
-        for (Method method : object.getClass().getMethods()) {
-            if (method.getName().equalsIgnoreCase("run"))
-                addRun(method, object);
-        }
+    static void addObject(Object object) {
+        if (!objectList.contains(object))
+            objectList.add(object);
     }
 
 //    public void addRun(Method method) {
@@ -47,45 +43,62 @@ public class CommandBase extends Base {
 //            System.out.println("This class does not have a valid run method. You should either have [MessageCreateEvent, String... args] or [String | String[], MessageCreateEvent] as your parameters. Ignoring...\n" + method.getName() + " in " + object.getClass().getName());
 //        }
 
-    static void addObject(Object object){
-        if(!objectList.contains(object))
-            objectList.add(object);
+    public static <T> Optional<T> getObject(Class<T> customClass) {
+        //noinspection unchecked
+        return ((Optional<T>) objectList.stream().filter(o -> o.getClass().equals(customClass)).findFirst());
+    }
+
+    public static ArrayList<Object> getObjectList() {
+        return objectList;
+    }
+
+    void gatherRuns(Object object) {
+        for (Method method : object.getClass().getMethods()) {
+            if (method.getName().equalsIgnoreCase("run"))
+                addRun(method, object);
+        }
     }
 
     void addRun(Method method, Object object) {
         addObject(object);
         method.setAccessible(true);
-        Class<?>[] classes = method.getParameterTypes();{
-            boolean allstring = true;
-            for (int i = 1; i < method.getParameterCount(); i++)
-                if (classes[i] != String.class) allstring = false;
-            if (method.getParameterCount() > 0 && classes[0].equals(MessageCreateEvent.class) && allstring) {
-                runs.put(method.getParameterCount() - 1, new MethodWrapper(method, object));
-            }
-            else if (method.getParameterCount() == 2 && classes[1].equals(MessageCreateEvent.class)) {
-                if (classes[0].equals(String[].class) && !runs.containsKey(-1))
-                    runs.put(-1, new MethodWrapper(method, object));
-                else if (classes[0].equals(String.class) && !runs.containsKey(-2))
-                    runs.put(-2, new MethodWrapper(method, object));
-                else
-                    System.out.println("This command does not have valid parameters. The first parameter must either be a string array or a string and the second should be a MessageCreateEvent." + getIgnore(method,object));
-            } else
-                System.out.println("This command does not have valid parameters. You should either have a [MessageCreateEvent, args...] (regular) or [String | String[], MessageCreateEvent] (all)." +  getIgnore(method, object));
-        }
+
+        Class<?> returnClass = method.getReturnType();
+        ReturnType returnType;
+        if(returnClass == EmbedMessage.class)
+            returnType = ReturnType.EmbedMessage;
+        else if(returnClass == String.class)
+            returnType = ReturnType.String;
+        else
+            returnType = ReturnType.None;
+
+
+
+        Class<?>[] classes = method.getParameterTypes();
+        boolean allstring = true;
+        for (int i = 1; i < method.getParameterCount(); i++)
+            if (classes[i] != String.class) allstring = false;
+        if (method.getParameterCount() > 0 && classes[0].equals(MessageCreateEvent.class) && allstring) {
+            runs.put(method.getParameterCount() - 1, new MethodInfo(method, object, returnType));
+        } else if (method.getParameterCount() == 2 && classes[1].equals(MessageCreateEvent.class)) {
+            if (classes[0].equals(String[].class) && !runs.containsKey(-1))
+                runs.put(-1, new MethodInfo(method, object, returnType));
+            else if (classes[0].equals(String.class) && !runs.containsKey(-2))
+                runs.put(-2, new MethodInfo(method, object, returnType));
+            else
+                System.out.println("This command does not have valid parameters. The first parameter must either be a string array or a string and the second should be a MessageCreateEvent." + getIgnore(method, object));
+        } else
+            System.out.println("This command does not have valid parameters. You should either have a [MessageCreateEvent, args...] (regular) or [String | String[], MessageCreateEvent] (all)." + getIgnore(method, object));
+
 
     }
 
-    private String getIgnore(Method method, Object object){
+    private String getIgnore(Method method, Object object) {
         return " Ignoring...\n" + method.getName() + " with parameters " + Arrays.toString(method.getParameterTypes()) + " in " + object.getClass().getName();
     }
 
-    public static <T> Optional<T> getObject(Class<T> customClass){
-        //noinspection unchecked
-        return ((Optional<T>) objectList.stream().filter(o -> o.getClass().equals(customClass)).findFirst());
-    }
-
-    public static ArrayList<Object> getObjectList(){
-        return objectList;
+    public static HashMap<String, CommandBase> getBaseList() {
+        return list;
     }
 
 }

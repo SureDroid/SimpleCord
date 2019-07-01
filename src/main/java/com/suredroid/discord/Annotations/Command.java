@@ -14,7 +14,7 @@ public @interface Command {
     String desc() default "";
     String usage() default "";
     String example() default "";
-    boolean visible() default true;
+    boolean hidden() default false;
 
     //To Add
     String[] aliases() default {};

@@ -1,7 +1,7 @@
 package com.suredroid.discord;
 
 import com.suredroid.discord.CommandSystem.CommandBase;
-import com.suredroid.discord.CommandSystem.CommandListener;
+import com.suredroid.discord.CommandSystem.CommandManager;
 import com.suredroid.discord.Configs.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,7 +10,6 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
-import org.javacord.api.listener.GloballyAttachableListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -28,8 +27,10 @@ public class DiscordBot {
     static Config config;
     private static String storagePath = "./";
 
+    public static boolean useBasicCommands = true;
 
-    private static CommandListener commandListener;
+
+    private static CommandManager commandManager;
 
     public static DiscordApi start(String token) {
         return start(token, AccountType.BOT);
@@ -57,8 +58,7 @@ public class DiscordBot {
         System.out.println("Starting The Bot...");
         api = builder.login().join();
         System.out.println("Connected. Now Loading Classes...");
-        commandListener = new CommandListener();
-        api.addListener(commandListener);
+        commandManager = new CommandManager();
         System.out.println("Loaded. Bot is ready to go!");
         return api;
     }
@@ -101,18 +101,8 @@ public class DiscordBot {
 
     public static Config getConfig() { return config; }
 
-    //CommandListener Static Extensions
-
-    public static <T extends GloballyAttachableListener> T addListener(T object) {
-        return commandListener.addListener(object);
-    }
-
-    public static <T extends GloballyAttachableListener> T addListener(Class<T> clazz) {
-        return commandListener.addListener(clazz);
-    }
-
-    public static <T> T generateObject(Class<T> clazz) {
-        return commandListener.generateObject(clazz);
+    public static CommandManager getCommandManager(){
+        return commandManager;
     }
 
     // Logging Functionality
