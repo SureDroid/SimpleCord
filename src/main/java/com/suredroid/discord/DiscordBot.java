@@ -1,6 +1,5 @@
 package com.suredroid.discord;
 
-import com.suredroid.discord.CommandSystem.CommandBase;
 import com.suredroid.discord.CommandSystem.CommandManager;
 import com.suredroid.discord.Configs.Config;
 import org.apache.logging.log4j.LogManager;
@@ -13,7 +12,6 @@ import org.javacord.api.event.message.MessageCreateEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.Optional;
 
 import static com.suredroid.discord.DUtils.*;
 
@@ -89,10 +87,6 @@ public class DiscordBot {
 
     public static DiscordApi getApi() {
         return api;
-    }
-
-    public static <T> Optional<T> getObject(Class<T> customClass) {
-        return CommandBase.getObject(customClass);
     }
 
     public static void setConfig(Config newConfig) {

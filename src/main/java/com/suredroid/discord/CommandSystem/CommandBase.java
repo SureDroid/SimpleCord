@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 public class CommandBase {
-    static ArrayList<Object> objectList = new ArrayList<>();
+
     static HashMap<String, CommandBase> list = new HashMap<>(), fullBase = new HashMap<>();
     HashMap<Integer, MethodInfo> runs = new HashMap<>();
     public CommandProperties properties;
@@ -21,10 +21,7 @@ public class CommandBase {
             fullBase.put(alias, this);
     }
 
-    static void addObject(Object object) {
-        if (!objectList.contains(object))
-            objectList.add(object);
-    }
+
 
 //    public void addRun(Method method) {
 //        method.setAccessible(true);
@@ -43,14 +40,7 @@ public class CommandBase {
 //            System.out.println("This class does not have a valid run method. You should either have [MessageCreateEvent, String... args] or [String | String[], MessageCreateEvent] as your parameters. Ignoring...\n" + method.getName() + " in " + object.getClass().getName());
 //        }
 
-    public static <T> Optional<T> getObject(Class<T> customClass) {
-        //noinspection unchecked
-        return ((Optional<T>) objectList.stream().filter(o -> o.getClass().equals(customClass)).findFirst());
-    }
 
-    public static ArrayList<Object> getObjectList() {
-        return objectList;
-    }
 
     void gatherRuns(Object object) {
         for (Method method : object.getClass().getMethods()) {
@@ -60,7 +50,7 @@ public class CommandBase {
     }
 
     void addRun(Method method, Object object) {
-        addObject(object);
+        CommandManager.addObject(object);
         method.setAccessible(true);
 
         Class<?> returnClass = method.getReturnType();

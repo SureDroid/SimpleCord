@@ -34,7 +34,6 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import static com.suredroid.discord.CommandSystem.CommandBase.fullBase;
-import static com.suredroid.discord.CommandSystem.CommandBase.getObjectList;
 
 
 public class CommandManager {
@@ -103,7 +102,7 @@ public class CommandManager {
         }
     }
 
-    public void addCommandObj(@NotNull CommandProperties properties, @NotNull Object object) {
+    public void addCommand(@NotNull CommandProperties properties, @NotNull Object object) {
         properties.check();
         if (CommandBase.list.keySet().contains(properties.getName())) {
             CommandBase cb = CommandBase.list.get(properties.getName());
@@ -233,7 +232,27 @@ public class CommandManager {
         }
     }
 
-    @SuppressWarnings({"unchecked", "Duplicates"})
+    static ArrayList<Object> objectList = new ArrayList<>();
+
+    public static void addObject(Object object) {
+        if (!objectList.contains(object))
+            objectList.add(object);
+    }
+
+    public static boolean removeObject(Object object) {
+        return objectList.remove(object);
+    }
+
+    private static ArrayList<Object> getObjectList() {
+        return objectList;
+    }
+
+    public static <T> Optional<T> getObject(Class<T> customClass) {
+        //noinspection unchecked
+        return ((Optional<T>) objectList.stream().filter(o -> o.getClass().equals(customClass)).findAny());
+    }
+
+    @SuppressWarnings("unchecked")
     public <T> T generateObject(@NotNull Class<T> clazz) {
         Optional<T> optobj = (Optional<T>) getObjectList().stream().filter(o -> o.getClass().equals(clazz)).findAny();
         if (optobj.isPresent())
