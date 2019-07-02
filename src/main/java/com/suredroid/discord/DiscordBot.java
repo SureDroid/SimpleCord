@@ -150,7 +150,4 @@ public class DiscordBot {
             api.getTextChannelById(config.getLoggingChannelId(serverId)).ifPresent(channel -> sendMessage(title, message, e.getMessageAuthor().getDisplayName(), e.getMessageAuthor().getAvatar(), channel));
     }
 
-
-
-
 }

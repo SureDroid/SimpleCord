@@ -191,10 +191,18 @@ public class DUtils {
         return baseEmbed.get();
     }
 
+    public static EmbedBuilder createEmbed(MessageCreateEvent e) {
+        return createEmbed().setAuthor(e.getMessageAuthor());
+    }
+
     public static EmbedBuilder createEmbed(String title, String message) {
-        return baseEmbed.get()
+        return createEmbed()
                 .setTitle(title)
                 .setDescription(message);
+    }
+
+    public static MessageBuilder createMessage(EmbedBuilder embed) {
+        return new MessageBuilder().setEmbed(embed);
     }
 
 

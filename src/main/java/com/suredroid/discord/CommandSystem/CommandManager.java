@@ -175,7 +175,7 @@ public class CommandManager {
     }
 
     private ClassGraph requiredInfoGraph() {
-        ClassGraph cg = new ClassGraph().enableAllInfo();
+        ClassGraph cg = new ClassGraph().enableAnnotationInfo().enableClassInfo().enableMethodInfo();
         if (!DiscordBot.useBasicCommands)
             cg.blacklistPackages("com.suredroid.discord.BasicCommands");
         return cg;
@@ -241,8 +241,9 @@ public class CommandManager {
         T customObject = null;
         try {
             if (isInnerClass(clazz)) {
+                System.out.println("Inner class " + clazz.getName());
                 Optional<Constructor<?>> optConst = Arrays.stream(clazz.getDeclaredConstructors()).filter(construct -> construct.getParameterCount() == 1 && construct.getParameterTypes()[0] == clazz.getEnclosingClass()).findFirst();
-                Optional<Constructor<?>> outerConst = Arrays.stream(clazz.getDeclaredConstructors()).filter(construct -> construct.getParameterCount() == 0).findAny();
+                Optional<Constructor<?>> outerConst = Arrays.stream(clazz.getEnclosingClass().getDeclaredConstructors()).filter(construct -> construct.getParameterCount() == 0).findAny();
                 if (optConst.isPresent() && outerConst.isPresent()) {
                     Object outer;
                     Optional<Object> optouter = getObjectList().stream().filter(obj -> obj.getClass().equals(clazz.getEnclosingClass())).findFirst();
@@ -393,8 +394,12 @@ public class CommandManager {
                     DUtils.sendMessage(e, StringUtils.capitalize(c.properties.getName()) + " Command Executed", (String) o);
                 else if (mw.getType().equals(ReturnType.EmbedMessage)) {
                     EmbedMessage message = (EmbedMessage) o;
-                    if (message.hasBothValues())
-                        DUtils.sendMessage(e, message.getTitle(), message.getMessage());
+                    if (message.isValid()) {
+                        if(message.isUsingEmbed())
+                                DUtils.sendMessage(message.getEmbedBuilder(),e.getChannel());
+                            else
+                                DUtils.sendMessage(e, message.getTitle(), message.getMessage());
+                    }
                 }
             }
         } catch (InvocationTargetException e1) {

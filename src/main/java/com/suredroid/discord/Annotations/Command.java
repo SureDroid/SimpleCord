@@ -16,12 +16,10 @@ public @interface Command {
     String example() default "";
     boolean hidden() default false;
 
-    //To Add
     String[] aliases() default {};
     PermissionType[] permissions() default {};
     String[] roles() default {};
 
-    //Opt
     boolean serverOnly() default false;
     boolean async() default false;
 }
