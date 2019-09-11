@@ -92,12 +92,14 @@ public class CommonUtils {
     public static <T> Optional<T> getJson(String filename, T object){
         File file = new File(DiscordBot.getStoragePath() +  filename);
         if(file.exists()){
-            try {
-                FileReader fr = new FileReader(file);
+            try (FileReader fr = new FileReader(file)) {
                 //noinspection unchecked
                 return Optional.of((T) gson.fromJson(fr, object.getClass()));
             } catch (FileNotFoundException e) {
                 System.out.println("File not found: " + filename);
+            } catch (IOException e) {
+                System.out.println("IOException while reading file.");
+                e.printStackTrace();
             }
         }
         return Optional.empty();
@@ -105,23 +107,24 @@ public class CommonUtils {
 
     public static <T> Optional<T> getJson(String filename, Type type){
         File file = new File(DiscordBot.getStoragePath() + filename);
-        if(file.exists()) try {
-            FileReader fr = new FileReader(file);
+        if(file.exists()) try (FileReader fr = new FileReader(file)) {
             return Optional.of(gson.fromJson(fr, type));
         } catch (FileNotFoundException e) {
             System.out.println("File not found: " + filename);
+        } catch (IOException e) {
+            System.out.println("IOException while reading file.");
+            e.printStackTrace();
         }
         return Optional.empty();
     }
 
     public static <T> Optional<T> getInternalJson(String filePath,  T object){
-        try {
-            InputStream stream = DiscordBot.class.getResourceAsStream(filePath);
-            InputStreamReader reader = new InputStreamReader(stream);
+        try (InputStream stream = DiscordBot.class.getResourceAsStream(filePath);
+             InputStreamReader reader = new InputStreamReader(stream);) {
             //noinspection unchecked
             return Optional.of((T) gson.fromJson(reader, object.getClass()));
-        } catch (NullPointerException e) {
-            System.out.println("File not found / Can't be read: " + filePath);
+        } catch (NullPointerException | IOException e) {
+            System.out.println("File not found / Can't be read: " + filePath + "\tMessage: " + e.getMessage());
         }
         return Optional.empty();
     }
@@ -151,14 +154,13 @@ public class CommonUtils {
 
 
     public static Optional<String> readInternalFile(String path) {
-        StringWriter writer = new StringWriter();
-        try {
+        try (StringWriter writer = new StringWriter()) {
             IOUtils.copy(DiscordBot.class.getResourceAsStream(path),writer, StandardCharsets.UTF_8);
+            return Optional.of(writer.toString());
         } catch (IOException | NullPointerException e) {
-            DiscordBot.logger.error(e.getMessage(),e);
+            System.out.println("File not found / Can't be read: " + path + "\tMessage: " + e.getMessage());
             return Optional.empty();
         }
-        return Optional.of(writer.toString());
     }
 
     public static boolean writeFile(String fileName, String data) {

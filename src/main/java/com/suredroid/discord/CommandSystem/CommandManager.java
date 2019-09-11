@@ -347,7 +347,8 @@ public class CommandManager {
                             return;
                         }
                     }
-                    if(!((c.properties.isServerOwnerOnly() && e.isServerMessage() && e.getMessageAuthor().isRegularUser() && e.getServer().get().isOwner(e.getMessageAuthor().asUser().get())) || (c.properties.isBotOwnerOnly() && e.getMessageAuthor().isBotOwner()))) {
+
+                    if((c.properties.isServerOwnerOnly() && !(e.isServerMessage() && e.getMessageAuthor().isRegularUser() && e.getServer().get().isOwner(e.getMessageAuthor().asUser().get()))) || (c.properties.isBotOwnerOnly() && !e.getMessageAuthor().isBotOwner()) ){
                         Error.NoPermission.send(e);
                         return;
                     }

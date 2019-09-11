@@ -104,9 +104,5 @@ You can also slap an @Listener and @Create annotation on any class. @Listener wi
 ### [Logging/Reporting](#logging)
 By default, SimpleCord provides a way to log and report, as well as logs command usage. You can do this by setting the config implementation. We provide two versions, a global logging for all servers, or server specific. If they don't fit your needs, you can create your own config implementation. Remember that if you use the ``DiscordBot#log`` or ``DiscordBot#report`` without providing a serverid, a null value will be provided.
 
-### [Moderation](#moderation) 
-SimpleCord also comes with Swear-filtering capabilities built in. Create a new AutoMod object set the SwearFilter (or use the DefaultSwearFilter), and add it as a listener. It will now block messages that contain the words reported from the swear filter.
-
-
 #### Congrats, you reached the end!
 Check out the wiki for more information on everything that simplecord provides and try adding it to your project and experimenting around. Have fun 👍
