@@ -16,9 +16,6 @@ public @interface Command {
     String example() default "";
     boolean hidden() default false;
 
-
-    //Add BotOwner and ServerOwner
-
     String[] aliases() default {};
     PermissionType[] permissions() default {};
     String[] roles() default {};
