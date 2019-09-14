@@ -11,7 +11,7 @@ import org.javacord.api.event.message.MessageCreateEvent;
 
 import java.awt.*;
 
-@Command(desc = "A command to get the commands for this bot.",usage = "(command)",example = "!help")
+@Command(desc = "A command to get the commands for this bot.",usage = "(command)")
 public class Help {
     public void run(MessageCreateEvent e) {
             EmbedBuilder builder = DUtils.createEmbed();
