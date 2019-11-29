@@ -18,7 +18,7 @@ repositories {
 dependencies {
 
     //Class Scanning
-    compile group: 'io.github.classgraph', name: 'classgraph', version: '4.8.47'
+    compile group: 'io.github.classgraph', name: 'classgraph', version: '4.8.57'
 
     //Audio Version Of Javacord
     compile group: 'com.github.Bastian', name: 'Lavaplayer-Wrapper', version: 'master-SNAPSHOT'
