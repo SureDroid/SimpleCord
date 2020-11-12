@@ -2,7 +2,7 @@
 
 Simplecord is [Javacord](https://github.com/Javacord/Javacord/) based framework dedicated to making the production of bots and commmands easier. 
 
-**Notice: Since SimpleCord is still in development, you may experience api breaking changed.**
+**Notice: Since SimpleCord is still in development, you may experience api breaking changes.**
 
 #### Features:
 - Custom Annotations (@Command, @Listener, @Create, etc.)
