@@ -2,8 +2,6 @@
 
 Simplecord is [Javacord](https://github.com/Javacord/Javacord/) based framework dedicated to making the production of bots and commmands easier. 
 
-**Notice: Since SimpleCord is still in development, you may experience api breaking changes.**
-
 #### Features:
 - Custom Annotations (@Command, @Listener, @Create, etc.)
 - Custom Discord Utilities (Confirmation Messages, Get User by Name, Id, or Mention, etc)
@@ -52,7 +50,7 @@ Lets say you want to create a simple **multiply** command, which multiplies two 
 ```
 This is all you need. It checks the command the user sent has two tokens, checks if both are integers, then sends you the result.
 
-![Example Image](https://image.prntscr.com/image/KwHUQbH2QjuSpoKXrOG2Xg.png)
+![Example Image](docs/assets/multiply-command.png)
 
 Now lets say we want to multiply however many arguments the user provided. We can do that as well. All you have to do is switch the Place MessageCreateEvent with the String, and change the String to a String array.
 ```java
@@ -67,7 +65,7 @@ You can provide as many variants of arguments as you would like. It goes from ch
 
 Now you may have noticed that we provide a description and a usage for our commands. While this is not required, it allows us to use an already provided Help command.
 
-![Example Image](https://image.prntscr.com/image/QQv-6UeBQkOemNGK4GFWcA.png)
+![Example Image](docs/assets/help-command.png)
 
 It also allows you to list all commands by just typing ``!help``. You can also access the description and usage and use it for your needs.
 
