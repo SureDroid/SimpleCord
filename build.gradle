@@ -33,7 +33,7 @@ dependencies {
     // runtimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version:'2.11.1'
 
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
-    compile group: 'org.apache.commons', name: 'commons-text', version: '1.8'
+    compile group: 'org.apache.commons', name: 'commons-text', version: '1.9'
 
     //Json Parsing
     implementation 'com.google.code.gson:gson:2.8.5'
